@@ -37,6 +37,10 @@
     margin: 10px 20px;
 }
 
+.listaProduto i{
+    color: #26a69a;
+}
+
 .clicado{
     color: orange;
 }
