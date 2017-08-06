@@ -1,0 +1,36 @@
+
+<div>
+    <ul id="conteudo">
+        
+    </ul>
+</div>
+
+<script>
+    $(function(){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: server+'estoque/mobile.php',
+            data:{
+                opt: 'getListaProdutos'
+            },
+            success: function(json){
+                $.each(json, function(idx, field) {
+                    var produto = field.Descricao;
+                    var codProduto = field.CodProduto;
+                    var saldo = field.Saldo;
+                  //  $("#materialList").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
+                    $("#conteudo").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
+                    window.localStorage.setItem(codProduto, produto);
+                });
+              //  $("#aaa").pagecontainer('change', "#listaMaterial", {transition: 'flow'});
+              //  $.mobile.changePage($("#listaMaterial"));
+              //  $("#materialList").listview("refresh");
+            } 
+        });
+    });
+    
+    
+    
+    
+</script>

@@ -1,0 +1,69 @@
+.erro{
+    box-shadow:0 0 12px red!important;
+}
+
+.listaProduto{
+    width: 100%;
+    font-size: 15px;
+/*    float: left!important;
+    position: relative!important;*/
+}
+
+.listaProduto button{
+    position: absolute!important;
+    right: 0px!important;
+    top: 0px!important;
+    width: 25%;
+    height: 100%!important;
+    line-height: 100%!important;
+    background-color: red!important;
+    color: white!important;
+}
+
+.apagar button{
+    display: none;
+}
+
+
+
+.rodapeFixo{
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    height: 50px;
+}
+
+.rodapeFixo i{
+    margin: 10px 20px;
+}
+
+.clicado{
+    color: orange;
+}
+
+.invisivel{
+    display: none;
+}
+
+#materialSolicitadoList{
+    font-size: 20px;
+}
+
+.seletor{
+    width: 10%;
+}
+.detalheListaPendente{
+    width: 70%;
+}
+
+.detalheListaPendente, .seletor{
+    position: relative;
+    float: left;
+    
+}
+
+.apagarBtn{
+    position: relative;
+    float: left;
+    width: 20%;
+}
