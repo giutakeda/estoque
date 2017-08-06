@@ -152,7 +152,7 @@ var app = {
                             var quantidade = field.Quantidade;
                             $("#materialSolicitadoList").append('<li class="listaProduto apagar"><div class="seletor" style="width: 30px; heigth: 100%;"><i class="invisivel fa fa-circle-o fa-2x" aria-hidden="true"></i></div><div class="detalheListaPendente"><span style="font-style: italic; font-weigth: bold;">'+apelido+'</span><br>'+setor+'<br>'+data+'<br>'+quantidade+'<br></div><div class="apagarBtn"><button class="apagar"><i class="fa fa-trash fa-3x" aria-hidden="true"></i></button></div></li>');
                         });
-                     //   $("#totalPendente").html(totalPendente);
+                        $("#totalPendente").html(json.totalPendente);
                         $("#materialSolicitadoList").on("swipeleft", function(event){
                             $(event.target).removeClass('apagar');
                           //  $(this).removeClass('apagar');
