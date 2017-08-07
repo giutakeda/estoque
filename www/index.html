@@ -81,22 +81,26 @@
         
         <!--################## MATERIAL SOLICITADO #######################--->
     	<div data-role="page" data-transition="slide" id="materialSolicitado">
-            <div data-role="header">
-                <img src="img/logo2.png" style="height: 50px; position: absolute; left: 2px;"/>
-                <h1 style="padding: 0px; margin: 0px; width: 100%; font-family: arial; font-size: 30px; text-align: center;">Controle de Estoque</h1>
+            <div class="cabecalhoFixo" data-role="header">
+                <div class="ladoEsquerdo">
+                    <i onclick="goto('pendentes');" class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
+                </div>
+                <div class="ladoDireito">
+                    <i id="selecioneEntrega" class="fa fa-list-ul fa-2x"></i>
+                </div>
             </div><!-- /header -->
-            <a href="#main"  data-transition="slide" id="back" ><button data-icon="back" class='ui-icon-back'>Voltar</button></a>
-            <div role="main" class="ui-content" style="margin-bottom: 35px;">
+            <div role="main" class="ui-content" style="margin: 50px 0px;">
                 <div style="text-align: center; font-size: 25px;" id="imagemMaterialSolicitado"></div>
                 <ul data-role="listview" id="materialSolicitadoList">
                 </ul>
             </div>
             <div class="rodapeFixo" data-role="footer">
                 <div id="totalPendente">
-                    <i id="selecioneEntrega" class="fa fa-list-ul fa-2x"></i>
-                    <i id="selecioneEntrega" class="fa fa-check-square-o fa-2x"></i>
-                    <i id="selecioneEntrega" class="fa fa-check-square-o fa-2x"></i>
+                    <div>
+                        <i id="selecioneEntrega" class="fa fa-list-ul fa-2x"></i>
+                    </div>
                     <div id="totalProduto"></div>
+                    <div><button>Confirmar</button></div>
                 </div>
             </div><!-- /footer -->
         </div><!-- /page -->
