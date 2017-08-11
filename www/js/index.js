@@ -1,4 +1,5 @@
 server = "";
+baixaArr = [];
 var app = {
      
     initialize: function() {
@@ -104,6 +105,7 @@ var app = {
             }
             $(".detalheListaPendente").toggleClass('detalheListaPendenteMenor');
             $("#selecioneEntrega").toggleClass('clicado');
+                alert(baixaArr);
         });
        
 
@@ -138,6 +140,7 @@ var app = {
                   barcode: result.text
               },
               success: function(json){
+                    baixaArr = [];
                     if (json.ret == false){
                         navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
                     }else{
@@ -156,13 +159,13 @@ var app = {
                             $("#materialSolicitadoList").append('<li onclick="selecionaPendente('+codHistorico+');" class="listaProduto apagar"><div class="seletor" style="width: 30px; heigth: 100%;"><i id="sel'+codHistorico+'" class="invisivel fa fa-square-o fa-2x" aria-hidden="true"></i></div><div style="font-size: 22px;" class="detalheListaPendente"><span style="font-size: 22px; font-style: italic; font-weigth: bold;">'+apelido+'</span><br>'+setor+'<br>'+data+'<div style="position: absolute; top: 30px; right: 10px; font-size: 27px;">'+quantidade+'</div></div></li>');
                         });
                         $("#totalProduto").html(json.totalPendente);
-                        $("#materialSolicitadoList").on("swipeleft", function(event){
-                            $(event.target).removeClass('apagar');
-                          //  $(this).removeClass('apagar');
-                        });
-                        $("#materialSolicitadoList li").on("swiperight", function(event){
-                            $(event.target).addClass('apagar');
-                        });
+//                        $("#materialSolicitadoList").on("swipeleft", function(event){
+//                            $(event.target).removeClass('apagar');
+//                          //  $(this).removeClass('apagar');
+//                        });
+//                        $("#materialSolicitadoList li").on("swiperight", function(event){
+//                            $(event.target).addClass('apagar');
+//                        });
                         $.mobile.changePage($("#materialSolicitado"));
                         $("#materialSolicitadoList").listview("refresh");
                     }
@@ -190,10 +193,15 @@ var app = {
 
 function selecionaPendente(codHistorico){
     if ($("#selecioneEntrega").hasClass('clicado')){
+        if ($("#sel"+codHistorico).hasClass('fa-square-o')){
+            baixaArr.push(codHistorico);
+        }else{
+            baixaArr.splice(baixaArr.indexOf(codHistorico), 1);
+        }
         $("#sel"+codHistorico).toggleClass('fa-check-square-o');
         $("#sel"+codHistorico).toggleClass('fa-square-o');
-        
     }
+
 }      
 
 function goto(page){
