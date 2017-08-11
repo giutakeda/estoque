@@ -76,6 +76,7 @@
 
 .invisivel{
     display: none;
+    transition: display 0.5s;
 }
 
 #materialSolicitadoList{
@@ -86,7 +87,11 @@
     width: 10%;
 }
 .detalheListaPendente{
-    width: 70%;
+    width: 90%;
+}
+
+.detalheListaPendenteMenor{
+    width: 87%;
 }
 
 .detalheListaPendente, .seletor{
