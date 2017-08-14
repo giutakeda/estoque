@@ -1,5 +1,6 @@
 server = "";
 baixaArr = [];
+todosArr = [];
 var app = {
      
     initialize: function() {
@@ -99,15 +100,33 @@ var app = {
         
         $("#selecioneEntrega").click(function(){
             if ($("#selecioneEntrega").hasClass('clicado')){
-                $("#materialSolicitadoList i").addClass('invisivel');
+                baixaArr = [];
+                $(".seletor i").removeClass('fa-check-square-o');
+                $(".seletor i").addClass('fa-square-o');
             }else{
-                $("#materialSolicitadoList i").removeClass('invisivel');
+                baixaArr = todosArr;
+                $(".seletor i").addClass('fa-check-square-o');
+                $(".seletor i").removeClass('fa-square-o');
             }
-            $(".detalheListaPendente").toggleClass('detalheListaPendenteMenor');
+            toggleBtnEntregaMaterial();
             $("#selecioneEntrega").toggleClass('clicado');
-                alert(baixaArr);
         });
-       
+        
+        $("#alteraBtn").click(function(){
+            $.ajax({
+                url: server+'estoque/mobile.php',
+                dataType: 'html',
+                type: 'POST',
+                data:{
+                    opt: 'alteraPedido',
+                    codHistorico: baixaArr
+                },
+                success: function(output){
+                    $("#contentJanelaAlteraPedido").html(output);
+                    $("#janelaAlteraPedido").removeClass("invisivel");
+                }
+            });
+        });
 
     },
 
@@ -141,6 +160,7 @@ var app = {
               },
               success: function(json){
                     baixaArr = [];
+                    todosArr = [];
                     if (json.ret == false){
                         navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
                     }else{
@@ -148,7 +168,7 @@ var app = {
                         var produto = json.dados.Descricao;
                         var codProduto = json.dados.CodProduto;
                         var totalPendente;
-                        $("#imagemMaterialSolicitado").html('<img style="width: 75%; margin: 0px auto;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/><p style="text-align: center; margin-top: 0px;">'+produto+'</p>');
+                        $("#imagemMaterialSolicitado").html('<img src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/><p>'+produto+'</p>');
                         $("#materialSolicitadoList").html('');
                         $.each(json.pendentes, function(idx, field){
                             var apelido = field.Apelido;
@@ -156,7 +176,8 @@ var app = {
                             var data = field.DataHistorico;
                             var codHistorico = field.CodHistorico;
                             var quantidade = field.Quantidade;
-                            $("#materialSolicitadoList").append('<li onclick="selecionaPendente('+codHistorico+');" class="listaProduto apagar"><div class="seletor" style="width: 30px; heigth: 100%;"><i id="sel'+codHistorico+'" class="invisivel fa fa-square-o fa-2x" aria-hidden="true"></i></div><div style="font-size: 22px;" class="detalheListaPendente"><span style="font-size: 22px; font-style: italic; font-weigth: bold;">'+apelido+'</span><br>'+setor+'<br>'+data+'<div style="position: absolute; top: 30px; right: 10px; font-size: 27px;">'+quantidade+'</div></div></li>');
+                            $("#materialSolicitadoList").append('<li onclick="selecionaPendente('+codHistorico+');" class="listaProduto"><div class="seletor" style="width: 30px; heigth: 100%;"><i id="sel'+codHistorico+'" class="fa fa-square-o fa-2x" aria-hidden="true"></i></div><div style="font-size: 22px;" class="detalheListaPendente"><span class="apelido">'+apelido+'</span><br><span class="setor">'+setor+'</span><br><span class="dataPedido">'+data+'</span><div class="quantidade">'+quantidade+'</div></div></li>');
+                            todosArr.push(codHistorico);
                         });
                         $("#totalProduto").html(json.totalPendente);
 //                        $("#materialSolicitadoList").on("swipeleft", function(event){
@@ -192,17 +213,34 @@ var app = {
 };
 
 function selecionaPendente(codHistorico){
-    if ($("#selecioneEntrega").hasClass('clicado')){
-        if ($("#sel"+codHistorico).hasClass('fa-square-o')){
-            baixaArr.push(codHistorico);
-        }else{
-            baixaArr.splice(baixaArr.indexOf(codHistorico), 1);
-        }
-        $("#sel"+codHistorico).toggleClass('fa-check-square-o');
-        $("#sel"+codHistorico).toggleClass('fa-square-o');
+    if ($("#sel"+codHistorico).hasClass('fa-square-o')){
+        baixaArr.push(codHistorico);
+    }else{
+        baixaArr.splice(baixaArr.indexOf(codHistorico), 1);
     }
+    toggleBtnEntregaMaterial();
+    $("#sel"+codHistorico).toggleClass('fa-check-square-o');
+    $("#sel"+codHistorico).toggleClass('fa-square-o');
 
 }      
+
+function toggleBtnEntregaMaterial(){
+    if (baixaArr.length > 0){
+        $("#confirmaBtn").removeClass("oculto");
+        if (baixaArr.length == 1){
+            $("#alteraBtn").removeClass("oculto");
+        }else{
+            $("#alteraBtn").addClass("oculto");
+        }
+    }else{
+        $("#confirmaBtn").addClass("oculto");
+        $("#alteraBtn").addClass("oculto");
+    }
+}
+
+function fechaJanela(janela){
+    $("#"+janela).addClass("invisivel");
+}
 
 function goto(page){
     

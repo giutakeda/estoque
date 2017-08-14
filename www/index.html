@@ -81,12 +81,12 @@
         
         <!--################## MATERIAL SOLICITADO #######################--->
     	<div data-role="page" data-transition="slide" id="materialSolicitado">
-            <div class="cabecalhoFixo" data-role="header">
+            <div class="cabecalhoFixo materialSolicitadoHeader" data-role="header">
                 <div class="ladoEsquerdo">
                     <i onclick="goto('pendentes');" class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
                 </div>
                 <div class="ladoDireito">
-                    <i id="selecioneEntrega" class="fa fa-list-ul fa-2x"></i>
+                    <i id="selecioneEntrega" class="fa fa-check-square-o fa-2x"></i>
                 </div>
             </div><!-- /header -->
             <div role="main" class="ui-content" style="margin: 50px 0px;">
@@ -96,10 +96,15 @@
             </div>
             <div class="rodapeFixo" data-role="footer">
                 <div id="totalPendente">
+                    <div><button id="alteraBtn" class="oculto">Alterar</button></div>
+                    <div><button id="confirmaBtn" class="oculto">Confirmar</button></div>
                     <div id="totalProduto"></div>
-                    <div><button>Confirmar</button></div>
                 </div>
             </div><!-- /footer -->
+            <div id="janelaAlteraPedido" class="popup invisivel">
+                <div class="inner-popup" id="contentJanelaAlteraPedido">
+                </div>
+            </div>
         </div><!-- /page -->
         
         
