@@ -42,11 +42,11 @@
                 <img src="img/logo2.png" style="height: 75px; position: absolute; left: 2px;"/>
                 <h1 style="padding: 0px; margin: 0px; width: 100%; font-family: arial; font-size: 30px; text-align: center;">Controle de Estoque</h1>
             </div><!-- /header -->
-            <div role="main" class="ui-content">
-                <button id="listaProdutos">Lista de produtos</button>
-                <button id="materialEntrega">Entrega de material</button>
+            <div role="main" class="ui-content paginaPrincipal">
+                <button id="listaProdutos">PRODUTOS</button>
+                <button id="materialEntrega">ENTREGAR</button>
             </div><!-- /conteúdo -->
-            <div data-role="footer">
+            <div class="rodapeFixo" data-role="footer">
                     <h4>Desenvolvido em 2017</h4>
             </div><!-- /footer -->
         </div>
@@ -67,13 +67,15 @@
         
         <!--################## ENTREGA DE MATERIAL #######################--->
     	<div data-role="page" data-transition="slide" id="pendentes">
-            <div data-role="header">
-                <img src="img/logo2.png" style="height: 50px; position: absolute; left: 2px;"/>
-                <h1 style="padding: 0px; margin: 0px; width: 100%; font-family: arial; font-size: 30px; text-align: center;">Controle de Estoque</h1>
+            <div class="cabecalhoFixo entregaMaterial" data-role="header">
+                <div class="ladoEsquerdo">
+                    <i onclick="goto('main');" class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
+                </div>    
+                <div class="ladoDireito">
+                    <i id="EntregaBCBtn" class="fa fa-barcode fa-2x"></i>
+                </div>
             </div><!-- /header -->
-            <a href="#main"  data-transition="slide" data-direction="reverse" id="back" ><button data-icon="back" class='ui-icon-back'>Voltar</button></a>
-            <button style="width: 50%;" id="EntregaBCBtn"><i class="fa fa-barcode fa-3x" aria-hidden="true"></i></button>
-            <div role="main" class="ui-content">
+            <div role="main" class="ui-content" style="margin: 50px 0px;">
                 <ul data-role="listview" id="materialPendente">
                 </ul>
             </div>

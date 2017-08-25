@@ -41,6 +41,7 @@
 
 .cabecalhoFixo div{
     position: relative;
+    float: left;
     height: 50px;
     width: 50%;
     line-height: 50px;
@@ -48,7 +49,7 @@
 }
 
 
-.materialSolicitadoHeader div{
+.materialSolicitadoHeader div, entregaMaterial div{
     width: 50%;
     float: left;
     position: relative;
@@ -177,9 +178,21 @@
 }
 
 .inner-popup{
-    margin: 20px auto;
+    margin: 55% auto;
     width: 90%;
-    height: 50%;
-    background-color: white;
-    padding-top: 50px;
+    height: auto;
+    background-color: rgba(0,0,0,0.7);
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.paginaPrincipal button{
+    width: 45%;
+    height: 80px;
+    float: left;
+    position: relative;
+    margin: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    overflow: auto;
 }

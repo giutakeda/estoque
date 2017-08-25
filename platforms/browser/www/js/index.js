@@ -6,7 +6,9 @@ var app = {
     initialize: function() {
         this.initFastClick();
         this.bindEvents();
-        server='http://cgnagoia.softether.net/';
+        //server='http://cgnagoia.softether.net/';
+        server='http://consulado.nagoia/';
+        //server='http://192.168.1.190/';
     },
     
     bindEvents: function() {
@@ -61,7 +63,7 @@ var app = {
                         var produto = field.Descricao;
                         var codProduto = field.CodProduto;
                         var saldo = field.Saldo;
-                        $("#materialList").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
+                        $("#materialList").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
                        // $("#aaa").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
                         window.localStorage.setItem(codProduto, produto);
                     });
@@ -72,25 +74,7 @@ var app = {
             });
         });
         $("#materialEntrega").click(function(){
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: server+'estoque/mobile.php',
-                data:{
-                    opt: 'getListaMaterialEntrega'
-                },
-                success: function(json){
-                    $("#materialPendente").html("");
-                    $.each(json, function(idx, field) {
-                        var produto = field.Descricao;
-                        var codProduto = field.CodProduto;
-                        var saldo = field.Saldo;
-                        $("#materialPendente").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
-                    });
-                    $('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
-                    $("#materialPendente").listview("refresh");
-                }
-            });
+            app.listaPendente();
         });
         $("#EntregaBCBtn").click(function(){
           //  alert ("abc");
@@ -127,6 +111,24 @@ var app = {
                 }
             });
         });
+        
+        $("#confirmaBtn").click(function(){
+            $.ajax({
+                url: server+'estoque/mobile.php',
+                dataType: 'html',
+                type: 'POST',
+                data:{
+                    opt: 'baixaPedido',
+                    codHistorico: baixaArr
+                },
+                success: function(output){
+                    if (output == true){
+                        app.listaPendente();
+                        listaPedidoProduto(barcode);
+                    }
+                }
+            });
+        });
 
     },
 
@@ -143,6 +145,28 @@ var app = {
         }
     },
     
+    listaPendente: function (){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: server+'estoque/mobile.php',
+            data:{
+                opt: 'getListaMaterialEntrega'
+            },
+            success: function(json){
+                $("#materialPendente").html("");
+                $.each(json, function(idx, field) {
+                    var produto = field.Descricao;
+                    var codProduto = field.CodProduto;
+                    var saldo = field.Saldo;
+                    $("#materialPendente").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
+                });
+                $('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
+                $("#materialPendente").listview("refresh");
+            }
+        });
+    },
+    
     erro:{
         
     },
@@ -150,48 +174,7 @@ var app = {
     barcodePendentesEntrega: function(){
       cordova.plugins.barcodeScanner.scan(
       function (result) {
-          $.ajax({
-              type: 'POST',
-              dataType: 'json',
-              url: server+'estoque/mobile.php',
-              data:{
-                  opt: 'getProdutoByCod',
-                  barcode: result.text
-              },
-              success: function(json){
-                    baixaArr = [];
-                    todosArr = [];
-                    if (json.ret == false){
-                        navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
-                    }else{
-//                        alert (JSON.stringify(json.pendentes));
-                        var produto = json.dados.Descricao;
-                        var codProduto = json.dados.CodProduto;
-                        var totalPendente;
-                        $("#imagemMaterialSolicitado").html('<img src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/><p>'+produto+'</p>');
-                        $("#materialSolicitadoList").html('');
-                        $.each(json.pendentes, function(idx, field){
-                            var apelido = field.Apelido;
-                            var setor = field.Setor;
-                            var data = field.DataHistorico;
-                            var codHistorico = field.CodHistorico;
-                            var quantidade = field.Quantidade;
-                            $("#materialSolicitadoList").append('<li onclick="selecionaPendente('+codHistorico+');" class="listaProduto"><div class="seletor" style="width: 30px; heigth: 100%;"><i id="sel'+codHistorico+'" class="fa fa-square-o fa-2x" aria-hidden="true"></i></div><div style="font-size: 22px;" class="detalheListaPendente"><span class="apelido">'+apelido+'</span><br><span class="setor">'+setor+'</span><br><span class="dataPedido">'+data+'</span><div class="quantidade">'+quantidade+'</div></div></li>');
-                            todosArr.push(codHistorico);
-                        });
-                        $("#totalProduto").html(json.totalPendente);
-//                        $("#materialSolicitadoList").on("swipeleft", function(event){
-//                            $(event.target).removeClass('apagar');
-//                          //  $(this).removeClass('apagar');
-//                        });
-//                        $("#materialSolicitadoList li").on("swiperight", function(event){
-//                            $(event.target).addClass('apagar');
-//                        });
-                        $.mobile.changePage($("#materialSolicitado"));
-                        $("#materialSolicitadoList").listview("refresh");
-                    }
-                }
-          });
+          listaPedidoProduto(result.text);
       },
       function (error) {
           alert("Erro no escaneamento: " + error);
@@ -211,6 +194,49 @@ var app = {
    );
 }
 };
+
+function listaPedidoProduto(codProduto){
+      barcode = codProduto;
+      $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          url: server+'estoque/mobile.php',
+          data:{
+              opt: 'getProdutoByCod',
+              barcode: codProduto
+          },
+          success: function(json){
+                baixaArr = [];
+                todosArr = [];
+                if (json.ret == false){
+                    navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
+                }else{
+                    if (json.pendentes === null){
+                        app.barcodePendentesEntrega();
+                    }else{
+                        var produto = json.dados.Descricao;
+                        var codProduto = json.dados.CodProduto;
+                        var totalPendente;
+                        $("#imagemMaterialSolicitado").html('<img src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/><p>'+produto+'</p>');
+                        $("#materialSolicitadoList").html('');
+                        $.each(json.pendentes, function(idx, field){
+                            var apelido = field.Apelido;
+                            var setor = field.Setor;
+                            var data = field.DataHistorico;
+                            var codHistorico = field.CodHistorico;
+                            var quantidade = field.Quantidade;
+                            $("#materialSolicitadoList").append('<li onclick="selecionaPendente('+codHistorico+');" class="listaProduto"><div class="seletor" style="width: 30px; heigth: 100%;"><i id="sel'+codHistorico+'" class="fa fa-square-o fa-2x" aria-hidden="true"></i></div><div style="font-size: 22px;" class="detalheListaPendente"><span class="apelido">'+apelido+'</span><br><span class="setor">'+setor+'</span><br><span class="dataPedido">'+data+'</span><div class="quantidade">'+quantidade+'</div></div></li>');
+                            todosArr.push(codHistorico);
+                        });
+                        $("#totalProduto").html(json.totalPendente);
+                        $.mobile.changePage($("#materialSolicitado"));
+                        $("#materialSolicitadoList").listview("refresh");
+                    }
+                }
+            }
+      });    
+}
+
 
 function selecionaPendente(codHistorico){
     if ($("#sel"+codHistorico).hasClass('fa-square-o')){
@@ -239,7 +265,32 @@ function toggleBtnEntregaMaterial(){
 }
 
 function fechaJanela(janela){
-    $("#"+janela).addClass("invisivel");
+    if (janela == 'janelaAlteraPedido'){
+        var codFunc = $("#edtCodFuncPedido").get(0).value;
+        var codSetor = $("#edtCodSetorPedido").get(0).value;
+        var qtd = $("#edtQtdPedido").get(0).value;
+        $.ajax({
+            type: 'POST',
+            url: server+'estoque/mobile.php',
+            data: {
+                opt: 'gravaAlteracaoPedido',
+                codFunc: codFunc,
+                codSetor: codSetor,
+                qtd: qtd
+            },
+            dataType: 'json',
+            success: function(json){
+                if (json.ret == true){
+                    listaPedidoProduto(json.codProduto);
+                    $("#"+janela).addClass("invisivel");
+                }else{
+                     navigator.notification.alert(json.error, erro, "Aviso", "OK");
+                }
+            }
+        });
+    }else{
+        $("#"+janela).addClass("invisivel");
+    }
 }
 
 function goto(page){
