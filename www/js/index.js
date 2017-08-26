@@ -7,8 +7,8 @@ var app = {
         this.initFastClick();
         this.bindEvents();
         //server='http://cgnagoia.softether.net/';
-        server='http://consulado.nagoia/';
-        //server='http://192.168.1.190/';
+        //server='http://consulado.nagoia/';
+        server='http://192.168.1.190/';
     },
     
     bindEvents: function() {
