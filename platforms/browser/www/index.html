@@ -45,20 +45,26 @@
             <div role="main" class="ui-content paginaPrincipal">
                 <button id="listaProdutos">PRODUTOS</button>
                 <button id="materialEntrega">ENTREGAR</button>
+                <button id="recebimentoMaterial">ENTRADA</button>
             </div><!-- /conteúdo -->
             <div class="rodapeFixo" data-role="footer">
                     <h4>Desenvolvido em 2017</h4>
             </div><!-- /footer -->
         </div>
+
         
         <!--################  LISTA DE PRODUTOS ####################-->
     	<div data-role="page" data-transition="slide" id="listaMaterial">
-            <div data-role="header">
-                <img src="img/logo2.png" style="height: 50px; position: absolute; left: 2px;"/>
-                <h1 style="padding: 0px; margin: 0px; width: 100%; font-family: arial; font-size: 30px; text-align: center;">Controle de Estoque</h1>
+            <div class="cabecalhoFixo entregaMaterial" data-role="header">
+                <div onclick="goback('main');" class="ladoEsquerdo">
+                    <i  class="fa fa-chevron-left" aria-hidden="true"></i>
+                </div>    
+                <div class="titulo">Lista de Produtos</div>
+                <div class="ladoDireito">
+                    <i id="PesquisaBCBtn" class="fa fa-barcode fa-2x"></i>
+                </div>
             </div><!-- /header -->
             <a href="#main" data-transition="slide" id="back" data-direction="reverse"><button data-icon="back" class='ui-icon-back'>Voltar</button></a>
-            <button id="barcodeBtn">Código de barras<i class="fa fa-barcode fa-3x" aria-hidden="true"></i></button>
             <div role="main" class="ui-content">
                 <ul data-role="listview" id="materialList">
                 </ul>
@@ -68,9 +74,10 @@
         <!--################## ENTREGA DE MATERIAL #######################--->
     	<div data-role="page" data-transition="slide" id="pendentes">
             <div class="cabecalhoFixo entregaMaterial" data-role="header">
-                <div class="ladoEsquerdo">
-                    <i onclick="goto('main');" class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
+                <div onclick="goback('main');" class="ladoEsquerdo">
+                    <i class="fa fa-chevron-left" aria-hidden="true"></i>
                 </div>    
+                <div class="titulo">Entregar Material</div>
                 <div class="ladoDireito">
                     <i id="EntregaBCBtn" class="fa fa-barcode fa-2x"></i>
                 </div>
@@ -84,8 +91,8 @@
         <!--################## MATERIAL SOLICITADO #######################--->
     	<div data-role="page" data-transition="slide" id="materialSolicitado">
             <div class="cabecalhoFixo materialSolicitadoHeader" data-role="header">
-                <div class="ladoEsquerdo">
-                    <i onclick="goto('pendentes');" class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
+                <div onclick="goback('pendentes');" class="ladoEsquerdo">
+                    <i class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
                 </div>
                 <div class="ladoDireito">
                     <i id="selecioneEntrega" class="fa fa-check-square-o fa-2x"></i>
@@ -109,6 +116,50 @@
             </div>
         </div><!-- /page -->
         
+        <!--################## RECEBIMENTO DE MATERIAL #######################--->
+    	<div data-role="page" data-transition="slide" id="recebimento">
+            <div class="cabecalhoFixo entregaMaterial" data-role="header">
+                <div onclick="goback('main');" class="ladoEsquerdo">
+                    <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                </div>    
+                <div class="titulo">Entrada Material</div>
+                <div class="ladoDireito">
+                    <i id="EntradaBCBtn" class="fa fa-barcode fa-2x"></i>
+                </div>
+            </div><!-- /header -->
+            <div role="main" class="ui-content" style="margin: 50px 0px;">
+                <ul data-role="listview" id="materialRecebimento">
+                </ul>
+            </div>
+        </div><!-- /page -->
+        <!--################## MATERIAL A RECEBER #######################--->
+    	<div data-role="page" data-transition="slide" id="materialRecebimentoPage">
+            <div class="cabecalhoFixo materialSolicitadoHeader" data-role="header">
+                <div onclick="goback('recebimento');" class="ladoEsquerdo">
+                    <i class="fa fa-chevron-left" aria-hidden="true">Voltar</i>
+                </div>
+                <div class="ladoDireito">
+                    <i id="selecionaRecebimento" class="fa fa-check-square-o fa-2x"></i>
+                </div>
+            </div><!-- /header -->
+            <div role="main" class="ui-content" style="margin: 50px 0px;">
+                <div style="text-align: center; font-size: 25px;" id="imagemMaterialRecebimento"></div>
+                <ul data-role="listview" id="materialRecebimentoList">
+                </ul>
+            </div>
+            <div class="rodapeFixo" data-role="footer">
+                <div id="totalPendente">
+                    <div><button class="oculto"></button></div>
+                    <div><button id="confirmaRecebimentoBtn" class="oculto">Confirmar</button></div>
+                    <div id="totalEntradaProduto"></div>
+                </div>
+            </div><!-- /footer -->
+            <div id="janelaAlteraPedido" class="popup invisivel">
+                <div class="inner-popup" id="contentJanelaAlteraPedido">
+                </div>
+            </div>
+        </div><!-- /page -->
+        
         
     	<div data-role="page" id="materialEntrega">
         <div data-role="header">
@@ -123,6 +174,12 @@
             </div><!-- /conteúdo -->
         </div><!-- /page -->
         
+
+        <div class="invisivel" id="loading">
+            <div>
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            </div>
+        </div>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="libs/fastclick.min.js"></script>
         <script src="libs/jquery-1.12.4.min.js"></script>

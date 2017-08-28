@@ -2,15 +2,13 @@ server = "";
 baixaArr = [];
 todosArr = [];
 var app = {
-     
     initialize: function() {
         this.initFastClick();
         this.bindEvents();
         //server='http://cgnagoia.softether.net/';
-        server='http://consulado.nagoia/';
-        //server='http://192.168.1.190/';
+        //server='http://consulado.nagoia/';
+        server='http://192.168.1.190/';
     },
-    
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         
@@ -63,11 +61,12 @@ var app = {
                         var produto = field.Descricao;
                         var codProduto = field.CodProduto;
                         var saldo = field.Saldo;
-                        $("#materialList").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
+                        $("#materialList").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div class="quantidade" style="text-align: right;">'+saldo+'</div></li>');
                        // $("#aaa").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
                         window.localStorage.setItem(codProduto, produto);
                     });
-                    $('body').pagecontainer('change', "#listaMaterial", {transition: 'flip'});
+                    goto('listaMaterial');
+                    //$('body').pagecontainer('change', "#listaMaterial", {transition: 'flip'});
                   //  $.mobile.changePage($("#listaMaterial"));
                     $("#materialList").listview("refresh");
                 } 
@@ -75,6 +74,9 @@ var app = {
         });
         $("#materialEntrega").click(function(){
             app.listaPendente();
+        });
+        $("#recebimentoMaterial").click(function(){
+            app.produtoReceber();
         });
         $("#EntregaBCBtn").click(function(){
           //  alert ("abc");
@@ -94,6 +96,20 @@ var app = {
             }
             toggleBtnEntregaMaterial();
             $("#selecioneEntrega").toggleClass('clicado');
+        });
+        
+        $("#selecionaRecebimento").click(function(){
+            if ($("#selecionaRecebimento").hasClass('clicado')){
+                recebimentoArr = [];
+                $(".seletor i").removeClass('fa-check-square-o');
+                $(".seletor i").addClass('fa-square-o');
+            }else{
+                recebimentoArr = todosArr;
+                $(".seletor i").addClass('fa-check-square-o');
+                $(".seletor i").removeClass('fa-square-o');
+            }
+            toggleBtnRecebimentoMaterial();
+            $("#selecionaRecebimento").toggleClass('clicado');
         });
         
         $("#alteraBtn").click(function(){
@@ -129,7 +145,27 @@ var app = {
                 }
             });
         });
-
+        
+        $("#confirmaRecebimentoBtn").click(function(){
+            $.ajax({
+                url: server+'estoque/mobile.php',
+                dataType: 'html',
+                type: 'POST',
+                data:{
+                    opt: 'entradaMaterial',
+                    codPMFinal: recebimentoArr
+                },
+                success: function(output){
+                    if (output == true){
+                        app.produtoReceber();
+                        app.listaEntradaProduto(barcode);
+                    }
+                }
+            });
+        });
+        $("#EntradaBCBtn").click(function(){
+            app.barcodeEntradaMaterial();
+        });
     },
 
     initFastClick : function() {
@@ -143,6 +179,54 @@ var app = {
         if (device.platform === 'iOS'){
             StatusBar.overlaysWebView(false);
         }
+        
+        // SQLite
+        var SQLite = window.cordova.require('cordova-sqlite-plugin.SQLite');
+        
+        
+        var sqlite = new SQLite('estoque');
+        
+//          sqlite.open(function(err) {
+//    alert('Connection opened');
+//    if (err) throw err;
+//    sqlite.query('SELECT ? + ? AS solution', [2, 3], function(err, res) {
+//      if (err) throw err;
+//      alert(JSON.stringify(res));
+//      // log(res.rows[0].solution);
+//      sqlite.close(function(err) {
+//        if (err) throw err;
+//        alert('Connection closed');
+//        SQLite.deleteDatabase('example', function(err) {
+//          if (err) throw err;
+//          alert('Database deleted');
+//        });
+//      });
+//    });
+//  });
+        
+        
+        
+        sqlite.query("CREATE DATABASE IF NOT EXISTS ?",['estoque'], function(err){
+            if (err) throw err;
+            sqlite.open(function(err) {
+                if (err) throw err;
+                      // ... 
+                sqlite.query("CREATE TABLE IF NOT EXISTS Conf (?, ?)", ['server', 'usuario'], function(err){
+                    if (err) throw err;
+                    sqlite.query("INSERT INTO Conf VALUES(?, ?)", ['localhost', 'Giuliano'], function(err){
+                        if (err) throw err;
+                        sqlite.query("SELECT * FROM ?" ,['conf'], function(err, res){
+                            if (err) throw err;
+                            alert(res);
+                              console.log(res.rows[0].usuario); 
+                        });
+                    });
+                });
+            });
+        });
+        
+        
+        
     },
     
     listaPendente: function (){
@@ -159,9 +243,11 @@ var app = {
                     var produto = field.Descricao;
                     var codProduto = field.CodProduto;
                     var saldo = field.Saldo;
-                    $("#materialPendente").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
+                    var total = field.Total;
+                    $("#materialPendente").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div class="quantidade" style="text-align: right;">'+total+' ('+saldo+')</div></li>');
                 });
-                $('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
+                //$('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
+                goto('pendentes');
                 $("#materialPendente").listview("refresh");
             }
         });
@@ -192,7 +278,95 @@ var app = {
           disableSuccessBeep: false // iOS
       }
    );
-}
+},
+    barcodeEntradaMaterial: function(){
+      cordova.plugins.barcodeScanner.scan(
+      function (result) {
+          app.listaEntradaProduto(result.text);
+      },
+      function (error) {
+          alert("Erro no escaneamento: " + error);
+      },
+      {
+          preferFrontCamera : false, // iOS and Android
+          showFlipCameraButton : true, // iOS and Android
+          showTorchButton : true, // iOS and Android
+          torchOn: false, // Android, launch with the torch switched on (if available)
+          prompt : "Localize o código de barras", // Android
+          resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+//          formats : "EAN_13", // default: all but PDF_417 and RSS_EXPANDED
+          orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
+          disableAnimations : true, // iOS
+          disableSuccessBeep: false // iOS
+      }
+   );        
+    },
+    produtoReceber: function(){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: server+'estoque/mobile.php',
+            data:{
+                opt: 'getListaProdutoReceber'
+            },
+            success: function(json){
+                $("#materialRecebimento").html("");
+                $.each(json, function(idx, field) {
+                    var produto = field.Descricao;
+                    var codProduto = field.CodProduto;
+                    var quantidade = field.Quantidade;
+                    var saldo = field.Saldo;
+                    var saldoFuturo = field.SaldoFuturo;
+                    var credor = field.Credor;
+                    $("#materialRecebimento").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
+                });
+                //$('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
+                goto('recebimento');
+                $("#materialRecebimento").listview("refresh");
+            }
+        });        
+    },
+    listaEntradaProduto: function(barcode){
+      $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          url: server+'estoque/mobile.php',
+          data:{
+              opt: 'getProdutoEntrada',
+              barcode: barcode
+          },
+          success: function(json){
+                recebimentoArr = [];
+                todosArr = [];
+                if (json.ret === false){
+                    navigator.notification.alert("Material não está na lista para receber e/ou código de barras não cadastrado no sistema\n" + barcode, app.erro, "Aviso", "OK");
+                }else{
+                    if (json.recebimento === null){
+                        app.produtoReceber();
+                    }else{
+                        var produto = json.dados.Descricao;
+                        var codProduto = json.dados.CodProduto;
+                        $("#imagemMaterialRecebimento").html('<img src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/><p>'+produto+'</p>');
+                        $("#materialRecebimentoList").html('');
+                        $.each(json.recebimento, function(idx, field){
+                            var credor = field.Credor;
+                            var setor = field.Setor;
+                            var data = field.DataHistorico;
+                            var codPMFinal = field.CodPMFinal;
+                            var quantidade = field.Quantidade;
+                            $("#materialRecebimentoList").append('<li onclick="selecionaEntrada('+codPMFinal+');" class="listaProduto"><div class="seletor" style="width: 30px; heigth: 100%;"><i id="sel'+codPMFinal+'" class="fa fa-square-o fa-2x" aria-hidden="true"></i></div><div style="font-size: 22px;" class="detalheListaPendente"><span class="apelido">'+credor+'</span><br><span class="setor">'+setor+'</span><br><span class="dataPedido">'+data+'</span><div class="quantidade">'+quantidade+'</div></div></li>');
+                            todosArr.push(codPMFinal);
+                        });
+                        $("#totalEntradaProduto").html(json.totalRecebimento);
+                        goto('materialRecebimentoPage');
+                        //$.mobile.changePage($("#materialSolicitado"));
+                        $("#materialRecebimentoList").listview("refresh");
+                    }
+                }
+                alert(json.ret);
+            }
+      });         
+    }
 };
 
 function listaPedidoProduto(codProduto){
@@ -208,7 +382,7 @@ function listaPedidoProduto(codProduto){
           success: function(json){
                 baixaArr = [];
                 todosArr = [];
-                if (json.ret == false){
+                if (json.ret === false){
                     navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
                 }else{
                     if (json.pendentes === null){
@@ -229,10 +403,12 @@ function listaPedidoProduto(codProduto){
                             todosArr.push(codHistorico);
                         });
                         $("#totalProduto").html(json.totalPendente);
-                        $.mobile.changePage($("#materialSolicitado"));
+                        goto('materialSolicitado');
+                        //$.mobile.changePage($("#materialSolicitado"));
                         $("#materialSolicitadoList").listview("refresh");
                     }
                 }
+                alert(json.ret);
             }
       });    
 }
@@ -248,7 +424,7 @@ function selecionaPendente(codHistorico){
     $("#sel"+codHistorico).toggleClass('fa-check-square-o');
     $("#sel"+codHistorico).toggleClass('fa-square-o');
 
-}      
+}    
 
 function toggleBtnEntregaMaterial(){
     if (baixaArr.length > 0){
@@ -261,6 +437,25 @@ function toggleBtnEntregaMaterial(){
     }else{
         $("#confirmaBtn").addClass("oculto");
         $("#alteraBtn").addClass("oculto");
+    }
+}
+
+function selecionaEntrada(codPMFinal){
+    if ($("#sel"+codPMFinal).hasClass('fa-square-o')){
+        recebimentoArr.push(codPMFinal);
+    }else{
+        recebimentoArr.splice(recebimentoArr.indexOf(codPMFinal), 1);
+    }
+    toggleBtnRecebimentoMaterial();
+    $("#sel"+codPMFinal).toggleClass('fa-check-square-o');
+    $("#sel"+codPMFinal).toggleClass('fa-square-o');
+
+}      
+function toggleBtnRecebimentoMaterial(){
+    if (recebimentoArr.length > 0){
+        $("#confirmaRecebimentoBtn").removeClass("oculto");
+    }else{
+        $("#confirmaRecebimentoBtn").addClass("oculto");
     }
 }
 
@@ -294,7 +489,9 @@ function fechaJanela(janela){
 }
 
 function goto(page){
-    
-    $('body').pagecontainer('change', '#'+page, {transition: 'flip'});    
-    
+    $('body').pagecontainer('change', '#'+page, {transition: 'slide', reverse: false});    
+}
+
+function goback(page){
+    $('body').pagecontainer('change', '#'+page, {transition: 'slide', reverse: true});    
 }

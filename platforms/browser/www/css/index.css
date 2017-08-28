@@ -43,7 +43,6 @@
     position: relative;
     float: left;
     height: 50px;
-    width: 50%;
     line-height: 50px;
     font-size: 20px;
 }
@@ -57,9 +56,21 @@
 
 .ladoDireito{
     text-align: right;
+    width: 20%;
 }
+
+.titulo{
+    text-align: center;
+    width: 60%;
+    font-size: 25px!important;
+    text-decoration: underline;
+    font-family: calibri!important;
+}
+
 .ladoEsquerdo{
     text-align: left;
+    width: 20%;
+    font-family: calibri!important;
 }
 
 .rodapeFixo{
@@ -145,7 +156,7 @@
 
 .quantidade{
     position: absolute; 
-    top: 30px; 
+    top: 50px; 
     right: 10px; 
     font-size: 27px!important;
     font-weight: bold!important;
@@ -195,4 +206,30 @@
     font-size: 15px;
     font-weight: bold;
     overflow: auto;
+}
+
+#loading i{
+    color: white;
+    margin: 0 auto;
+    
+}
+
+#loading{
+    background-color: rgba(0,0,0,0.4);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0px;
+}
+
+#loading div{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 20%;
+    height: 10%;
+    margin: auto;
+    text-align: center;
 }
