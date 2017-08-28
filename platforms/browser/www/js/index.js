@@ -178,6 +178,7 @@ var app = {
         console.log(navigator.notification);
         if (device.platform === 'iOS'){
             StatusBar.overlaysWebView(false);
+            StatusBar.backgroundColorByName("black");
         }
         
         // SQLite
