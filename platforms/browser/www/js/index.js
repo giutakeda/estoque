@@ -6,8 +6,8 @@ var app = {
         this.initFastClick();
         this.bindEvents();
         //server='http://cgnagoia.softether.net/';
-        //server='http://consulado.nagoia/';
-        server='http://192.168.1.190/';
+        server='http://consulado.nagoia/';
+        //server='http://192.168.1.190/';
     },
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
@@ -380,7 +380,7 @@ var app = {
                     var saldo = field.Saldo;
                     var saldoFuturo = field.SaldoFuturo;
                     var credor = field.Credor;
-                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', '+paginaOrigem+');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i style="color: #26a69a;" class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
+                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', \''+paginaOrigem+'\');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i style="color: #26a69a;" class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
                 });
                 //$('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
                 goto('recebimento');
