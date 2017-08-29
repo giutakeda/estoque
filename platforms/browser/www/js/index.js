@@ -49,6 +49,7 @@ var app = {
             }
         });
         $("#listaProdutos").click(function(){
+            paginaOrigem = 'listaMaterial';
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -61,7 +62,7 @@ var app = {
                         var produto = field.Descricao;
                         var codProduto = field.CodProduto;
                         var saldo = field.Saldo;
-                        $("#materialList").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div class="quantidade" style="text-align: right;">'+saldo+'</div></li>');
+                        $("#materialList").append('<li onclick="showProduto('+codProduto+', \'listaMaterial\');"><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div class="quantidade" style="text-align: right;">'+saldo+'</div></li>');
                        // $("#aaa").append('<li ><img style="width: 75px;" src="'+server+'estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="text-align: right;">'+saldo+'</div></li>');
                         window.localStorage.setItem(codProduto, produto);
                     });
@@ -72,6 +73,9 @@ var app = {
                 } 
             });
         });
+        $("#PesquisaBCBtn").click(function(){
+            app.barcode('pesquisaProduto');
+        });
         $("#materialEntrega").click(function(){
             app.listaPendente();
         });
@@ -79,13 +83,11 @@ var app = {
             app.produtoReceber();
         });
         $("#EntregaBCBtn").click(function(){
-          //  alert ("abc");
-           // alert (window.localStorage.getItem('codFunc'));
-            app.barcodePendentesEntrega();
+            app.barcode('listaPedidoProduto');
         });
         
         $("#cadastraBarcode").click(function(){
-            app.barcodeCadastra();
+            app.barcode('cadastraNovoBarcode');
         });
         
         $("#selecioneEntrega").click(function(){
@@ -144,7 +146,7 @@ var app = {
                 success: function(output){
                     if (output == true){
                         app.listaPendente();
-                        listaPedidoProduto(barcode);
+                        app.listaPedidoProduto(barcode);
                     }
                 }
             });
@@ -168,7 +170,8 @@ var app = {
             });
         });
         $("#EntradaBCBtn").click(function(){
-            app.barcodeEntradaMaterial();
+           // app.barcodeEntradaMaterial();
+            app.barcode('listaEntradaProduto');
         });
     },
 
@@ -261,30 +264,45 @@ var app = {
     erro:{
         
     },
-    barcodeCadastra: function(){
+//    barcodePendentesEntrega: function(){
+//      cordova.plugins.barcodeScanner.scan(
+//      function (result) {
+//          listaPedidoProduto(result.text);
+//      },
+//      function (error) {
+//          alert("Erro no escaneamento: " + error);
+//      },
+//      {
+//          preferFrontCamera : false, // iOS and Android
+//          showFlipCameraButton : true, // iOS and Android
+//          showTorchButton : true, // iOS and Android
+//          torchOn: false, // Android, launch with the torch switched on (if available)
+//          prompt : "Localize o código de barras", // Android
+//          resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+//          orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
+//          disableAnimations : true, // iOS
+//          disableSuccessBeep: false // iOS
+//      }
+//   );
+//},
+    barcode: function(op){
         cordova.plugins.barcodeScanner.scan(
         function (result) {
-            app.cadastraNovoBarcode(result.text);
-        },
-        function (error) {
-            alert("Erro no escaneamento: " + error);
-        },
-        {
-            preferFrontCamera : false, // iOS and Android
-            showFlipCameraButton : true, // iOS and Android
-            showTorchButton : true, // iOS and Android
-            torchOn: false, // Android, launch with the torch switched on (if available)
-            prompt : "Localize o código de barras", // Android
-            resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-            orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
-            disableAnimations : true, // iOS
-            disableSuccessBeep: false // iOS
-        });
-    },
-    barcodePendentesEntrega: function(){
-      cordova.plugins.barcodeScanner.scan(
-      function (result) {
-          listaPedidoProduto(result.text);
+            switch (op){
+                case 'cadastraNovoBarcode':
+                    app.cadastraNovoBarcode(result.text);
+                    break;
+                case 'listaPedidoProduto':
+                    app.listaPedidoProduto(result.text);
+                    break;
+                case 'listaEntradaProduto':
+                    app.listaEntradaProduto(result.text);
+                    break;
+                case 'pesquisaProduto':
+                    paginaOrigem = 'listaMaterial';
+                    showProduto(result.text, 'listaMaterial');
+                    break;
+          }
       },
       function (error) {
           alert("Erro no escaneamento: " + error);
@@ -303,29 +321,49 @@ var app = {
       }
    );
 },
-    barcodeEntradaMaterial: function(){
-      cordova.plugins.barcodeScanner.scan(
-      function (result) {
-          app.listaEntradaProduto(result.text);
-      },
-      function (error) {
-          alert("Erro no escaneamento: " + error);
-      },
-      {
-          preferFrontCamera : false, // iOS and Android
-          showFlipCameraButton : true, // iOS and Android
-          showTorchButton : true, // iOS and Android
-          torchOn: false, // Android, launch with the torch switched on (if available)
-          prompt : "Localize o código de barras", // Android
-          resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-//          formats : "EAN_13", // default: all but PDF_417 and RSS_EXPANDED
-          orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
-          disableAnimations : true, // iOS
-          disableSuccessBeep: false // iOS
-      }
-   );        
-    },
+    cadastraNovoBarcode: function(barcode){
+    $.ajax({
+        type: 'POST',
+        url: server+'estoque/mobile.php',
+        dataType: 'json',
+        data:{
+            opt: 'cadastraNovoBarcode',
+            barcode: barcode
+        },
+        success: function(json){
+            if (json.ret === true){
+                showProduto(json.codProduto, paginaOrigem);
+            }else{
+                navigator.notification.alert(json.error+"\n", app.erro, "Aviso", "OK");
+            }
+        }
+    });
+},
+
+//    barcodeEntradaMaterial: function(){
+//      cordova.plugins.barcodeScanner.scan(
+//      function (result) {
+//          app.listaEntradaProduto(result.text);
+//      },
+//      function (error) {
+//          alert("Erro no escaneamento: " + error);
+//      },
+//      {
+//          preferFrontCamera : false, // iOS and Android
+//          showFlipCameraButton : true, // iOS and Android
+//          showTorchButton : true, // iOS and Android
+//          torchOn: false, // Android, launch with the torch switched on (if available)
+//          prompt : "Localize o código de barras", // Android
+//          resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+////          formats : "EAN_13", // default: all but PDF_417 and RSS_EXPANDED
+//          orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
+//          disableAnimations : true, // iOS
+//          disableSuccessBeep: false // iOS
+//      }
+//   );        
+//    },
     produtoReceber: function(){
+        paginaOrigem = 'recebimento';
         $.ajax({
             type: 'POST',
             dataType: 'json',
@@ -342,7 +380,7 @@ var app = {
                     var saldo = field.Saldo;
                     var saldoFuturo = field.SaldoFuturo;
                     var credor = field.Credor;
-                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', \'recebimento\');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
+                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', '+paginaOrigem+');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i style="color: #26a69a;" class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
                 });
                 //$('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
                 goto('recebimento');
@@ -387,31 +425,10 @@ var app = {
                         $("#materialRecebimentoList").listview("refresh");
                     }
                 }
-                alert(json.ret);
             }
       });         
     },
-    cadastraNovoBarcode: function(barcode){
-        $.ajax({
-            type: 'POST',
-            url: server+'estoque/mobile.php',
-            dataType: 'json',
-            data:{
-                opt: 'cadastraNovoBarcode',
-                barcode: barcode
-            },
-            success: function(json){
-                if (json.ret === true){
-                    showProduto(json.codProduto, 'recebimento');
-                }else{
-                    navigator.notification.alert(json.error+"\n", app.erro, "Aviso", "OK");
-                }
-            }
-        });
-    }
-};
-
-function listaPedidoProduto(codProduto){
+    listaPedidoProduto: function(codProduto){
       barcode = codProduto;
       $.ajax({
           type: 'POST',
@@ -428,7 +445,8 @@ function listaPedidoProduto(codProduto){
                     navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
                 }else{
                     if (json.pendentes === null){
-                        app.barcodePendentesEntrega();
+                        app.barcode('listaPedidoProduto');
+                       // app.barcodePendentesEntrega();
                     }else{
                         var produto = json.dados.Descricao;
                         var codProduto = json.dados.CodProduto;
@@ -450,11 +468,10 @@ function listaPedidoProduto(codProduto){
                         $("#materialSolicitadoList").listview("refresh");
                     }
                 }
-                alert(json.ret);
             }
       });    
-}
-
+    }
+};
 
 function selecionaPendente(codHistorico){
     if ($("#sel"+codHistorico).hasClass('fa-square-o')){
@@ -518,7 +535,7 @@ function fechaJanela(janela){
             dataType: 'json',
             success: function(json){
                 if (json.ret == true){
-                    listaPedidoProduto(json.codProduto);
+                    app.listaPedidoProduto(json.codProduto);
                     $("#"+janela).addClass("invisivel");
                 }else{
                      navigator.notification.alert(json.error, erro, "Aviso", "OK");
@@ -553,22 +570,20 @@ function showProduto(codProduto, pagina){
         dataType: 'json',
         success: function(json){
             if (json.ret == true){
-                
-                $("#imagemTelaProduto").html('<img src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>');
-                var input1 = '<input class="produtoInput" type="text" value="'+json.produto.Descricao+'" />';
-                var label1 = '<p class="labelPequeno">Código de barras</p>';
-                var barcode = "";
+                $("#imagemTelaProduto").html('<img style="width: 75%;" src="'+server+'Arquivos/Estoque/imagemProduto/'+json.produto.CodProduto+'.jpg"/>');
+                var html = '<input class="produtoInput" type="text" value="'+json.produto.Descricao+'" />';
+                html = html + '<p class="labelPequeno">Saldo</p>';
+                html = html + '<p class="barcode">'+json.produto.Saldo+' '+json.produto.Unidade+'</p>';
+                html = html + '<p class="labelPequeno">Código de barras</p>';
                 $.each(json.barcode, function(idx, field){
-                    barcode = barcode + '<p class="barcode">'+field.Barcode+'</p>';
+                    html = html + '<p class="barcode">'+field.Barcode+'</p>';
                 });
-                
-                $("#detalheProduto").html(input1+label1+barcode);
-                
+                $("#detalheProduto").html(html);
                 goto('telaProduto');
             }else{
                  navigator.notification.alert(json.error, erro, "Aviso", "OK");
             }
-        }
+        }    
     });    
     
 }
