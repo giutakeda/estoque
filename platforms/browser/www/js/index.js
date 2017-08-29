@@ -380,7 +380,7 @@ var app = {
                     var saldo = field.Saldo;
                     var saldoFuturo = field.SaldoFuturo;
                     var credor = field.Credor;
-                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', \''+paginaOrigem+'\');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i style="color: #26a69a;" class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
+                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', \''+paginaOrigem+'\');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+quantidade+' <i style="color: #26a69a;" class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
                 });
                 //$('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
                 goto('recebimento');
