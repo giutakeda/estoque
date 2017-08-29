@@ -84,6 +84,10 @@ var app = {
             app.barcodePendentesEntrega();
         });
         
+        $("#cadastraBarcode").click(function(){
+            app.barcodeCadastra();
+        });
+        
         $("#selecioneEntrega").click(function(){
             if ($("#selecioneEntrega").hasClass('clicado')){
                 baixaArr = [];
@@ -182,10 +186,10 @@ var app = {
         }
         
         // SQLite
-        var SQLite = window.cordova.require('cordova-sqlite-plugin.SQLite');
-        
-        
-        var sqlite = new SQLite('estoque');
+//        var SQLite = window.cordova.require('cordova-sqlite-plugin.SQLite');
+//        
+//        
+//        var sqlite = new SQLite('estoque');
         
 //          sqlite.open(function(err) {
 //    alert('Connection opened');
@@ -207,24 +211,24 @@ var app = {
         
         
         
-        sqlite.query("CREATE DATABASE IF NOT EXISTS ?",['estoque'], function(err){
-            if (err) throw err;
-            sqlite.open(function(err) {
-                if (err) throw err;
-                      // ... 
-                sqlite.query("CREATE TABLE IF NOT EXISTS Conf (?, ?)", ['server', 'usuario'], function(err){
-                    if (err) throw err;
-                    sqlite.query("INSERT INTO Conf VALUES(?, ?)", ['localhost', 'Giuliano'], function(err){
-                        if (err) throw err;
-                        sqlite.query("SELECT * FROM ?" ,['conf'], function(err, res){
-                            if (err) throw err;
-                            alert(res);
-                              console.log(res.rows[0].usuario); 
-                        });
-                    });
-                });
-            });
-        });
+//        sqlite.query("CREATE DATABASE IF NOT EXISTS ?",['estoque'], function(err){
+//            if (err) throw err;
+//            sqlite.open(function(err) {
+//                if (err) throw err;
+//                      // ... 
+//                sqlite.query("CREATE TABLE IF NOT EXISTS Conf (?, ?)", ['server', 'usuario'], function(err){
+//                    if (err) throw err;
+//                    sqlite.query("INSERT INTO Conf VALUES(?, ?)", ['localhost', 'Giuliano'], function(err){
+//                        if (err) throw err;
+//                        sqlite.query("SELECT * FROM ?" ,['conf'], function(err, res){
+//                            if (err) throw err;
+//                            alert(res);
+//                              console.log(res.rows[0].usuario); 
+//                        });
+//                    });
+//                });
+//            });
+//        });
         
         
         
@@ -257,7 +261,26 @@ var app = {
     erro:{
         
     },
-    
+    barcodeCadastra: function(){
+        cordova.plugins.barcodeScanner.scan(
+        function (result) {
+            app.cadastraNovoBarcode(result.text);
+        },
+        function (error) {
+            alert("Erro no escaneamento: " + error);
+        },
+        {
+            preferFrontCamera : false, // iOS and Android
+            showFlipCameraButton : true, // iOS and Android
+            showTorchButton : true, // iOS and Android
+            torchOn: false, // Android, launch with the torch switched on (if available)
+            prompt : "Localize o código de barras", // Android
+            resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+            orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
+            disableAnimations : true, // iOS
+            disableSuccessBeep: false // iOS
+        });
+    },
     barcodePendentesEntrega: function(){
       cordova.plugins.barcodeScanner.scan(
       function (result) {
@@ -319,7 +342,7 @@ var app = {
                     var saldo = field.Saldo;
                     var saldoFuturo = field.SaldoFuturo;
                     var credor = field.Credor;
-                    $("#materialRecebimento").append('<li ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
+                    $("#materialRecebimento").append('<li onclick="showProduto('+codProduto+', \'recebimento\');" ><img style="width: 75px;" src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>'+produto+'<br><div style="font-style: italic;">'+credor+'</div><br><div class="quantidade" style="text-align: right;">'+saldo+' <i class="fa fa-long-arrow-right" aria-hidden="true"></i>'+saldoFuturo+'</div></li>');
                 });
                 //$('body').pagecontainer('change', '#pendentes', {transition: 'flip'});
                 goto('recebimento');
@@ -367,6 +390,24 @@ var app = {
                 alert(json.ret);
             }
       });         
+    },
+    cadastraNovoBarcode: function(barcode){
+        $.ajax({
+            type: 'POST',
+            url: server+'estoque/mobile.php',
+            dataType: 'json',
+            data:{
+                opt: 'cadastraNovoBarcode',
+                barcode: barcode
+            },
+            success: function(json){
+                if (json.ret === true){
+                    showProduto(json.codProduto, 'recebimento');
+                }else{
+                    navigator.notification.alert(json.error+"\n", app.erro, "Aviso", "OK");
+                }
+            }
+        });
     }
 };
 
@@ -494,5 +535,40 @@ function goto(page){
 }
 
 function goback(page){
+    if (page === undefined){
+        page = paginaAnterior;
+    }
     $('body').pagecontainer('change', '#'+page, {transition: 'slide', reverse: true});    
+}
+
+function showProduto(codProduto, pagina){
+    paginaAnterior = pagina;
+    $.ajax({
+        type: 'POST',
+        url: server+'estoque/mobile.php',
+        data: {
+            opt: 'showProduto',
+            codProduto: codProduto
+        },
+        dataType: 'json',
+        success: function(json){
+            if (json.ret == true){
+                
+                $("#imagemTelaProduto").html('<img src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/>');
+                var input1 = '<input class="produtoInput" type="text" value="'+json.produto.Descricao+'" />';
+                var label1 = '<p class="labelPequeno">Código de barras</p>';
+                var barcode = "";
+                $.each(json.barcode, function(idx, field){
+                    barcode = barcode + '<p class="barcode">'+field.Barcode+'</p>';
+                });
+                
+                $("#detalheProduto").html(input1+label1+barcode);
+                
+                goto('telaProduto');
+            }else{
+                 navigator.notification.alert(json.error, erro, "Aviso", "OK");
+            }
+        }
+    });    
+    
 }

@@ -51,7 +51,36 @@
                     <h4>Desenvolvido em 2017</h4>
             </div><!-- /footer -->
         </div>
-
+        
+        
+        <!--################## TELA DO PRODUTO #######################--->
+    	<div data-role="page" data-transition="slide" id="telaProduto">
+            <div class="cabecalhoFixo materialSolicitadoHeader" data-role="header">
+                <div onclick="goback();" class="ladoEsquerdo">
+                    <div style="text-align: left; position: relative; float: left;">
+                        <i style="text-align: left; position: relative; float: left;" class="fa fa-chevron-left fa-2x" aria-hidden="true"></i>
+                        <div style="text-align: left; position: relative; float: left;">VOLTAR</div>
+                    </div>
+                </div>
+                <div class="ladoDireito">
+                    <div style="text-align: right; position: relative; float: right; width: 100%;">
+                        <i id="cadastraBarcode" style="text-align: left; position: relative; float: right;" class="fa fa-barcode fa-2x" aria-hidden="true"></i>
+                        <div style="text-align: right; position: relative; float: right; margin-right: 5px;">CADASTRAR</div>
+                    </div>
+                </div>
+            </div><!-- /header -->
+            <div role="main" class="ui-content" style="margin: 50px 0px;">
+                <div style="text-align: center; font-size: 25px;" id="imagemTelaProduto"></div>
+                <div id="detalheProduto"></div>
+            </div>
+            <div class="rodapeFixo" data-role="footer">
+                <!--div id="totalPendente">
+                    <div><button id="showProdutoBtn" class="oculto">Alterar</button></div>
+                    <div><button id="" class="oculto">Confirmar</button></div>
+                    <div id=""></div>
+                </div-->
+            </div><!-- /footer -->
+        </div><!-- /page -->
         
         <!--################  LISTA DE PRODUTOS ####################-->
     	<div data-role="page" data-transition="slide" id="listaMaterial">
@@ -154,10 +183,6 @@
                     <div id="totalEntradaProduto"></div>
                 </div>
             </div><!-- /footer -->
-            <div id="janelaAlteraPedido" class="popup invisivel">
-                <div class="inner-popup" id="contentJanelaAlteraPedido">
-                </div>
-            </div>
         </div><!-- /page -->
         
         

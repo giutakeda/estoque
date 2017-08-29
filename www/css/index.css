@@ -233,3 +233,24 @@
     margin: auto;
     text-align: center;
 }
+
+.produtoInput{
+    font-size: 24px;
+    
+    
+}
+
+.labelPequeno{
+    padding: 0px;
+    font-style: italic;
+    font-weight: bold;
+    margin: 2px;
+    color: #26a69a;
+}
+
+.barcode{
+    padding: 0px;
+    font-weight: bold;
+    margin: 1px;
+    font-size: 18px;
+}
