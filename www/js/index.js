@@ -58,6 +58,7 @@ var app = {
                     opt: 'getListaProdutos'
                 },
                 success: function(json){
+                    $("#materialList").empty();
                     $.each(json, function(idx, field) {
                         var produto = field.Descricao;
                         var codProduto = field.CodProduto;
@@ -260,31 +261,6 @@ var app = {
             }
         });
     },
-    
-    erro:{
-        
-    },
-//    barcodePendentesEntrega: function(){
-//      cordova.plugins.barcodeScanner.scan(
-//      function (result) {
-//          listaPedidoProduto(result.text);
-//      },
-//      function (error) {
-//          alert("Erro no escaneamento: " + error);
-//      },
-//      {
-//          preferFrontCamera : false, // iOS and Android
-//          showFlipCameraButton : true, // iOS and Android
-//          showTorchButton : true, // iOS and Android
-//          torchOn: false, // Android, launch with the torch switched on (if available)
-//          prompt : "Localize o código de barras", // Android
-//          resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-//          orientation : "portrait", // Android only (portrait|landscape), default unset so it rotates with the device
-//          disableAnimations : true, // iOS
-//          disableSuccessBeep: false // iOS
-//      }
-//   );
-//},
     barcode: function(op){
         cordova.plugins.barcodeScanner.scan(
         function (result) {
@@ -428,6 +404,8 @@ var app = {
             }
       });         
     },
+    erro: function(){
+    },
     listaPedidoProduto: function(codProduto){
       barcode = codProduto;
       $.ajax({
@@ -441,8 +419,8 @@ var app = {
           success: function(json){
                 baixaArr = [];
                 todosArr = [];
-                if (json.ret === false){
-                    navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + result.text, app.erro, "Aviso", "OK");
+                if (json.ret==false){
+                    navigator.notification.alert("Material diferente do solicitado e/ou código de barras não cadastrado no sistema\n" + barcode, app.erro, "Aviso", "OK");
                 }else{
                     if (json.pendentes === null){
                         app.barcode('listaPedidoProduto');
@@ -450,7 +428,6 @@ var app = {
                     }else{
                         var produto = json.dados.Descricao;
                         var codProduto = json.dados.CodProduto;
-                        var totalPendente;
                         $("#imagemMaterialSolicitado").html('<img src="'+server+'Arquivos/Estoque/imagemProduto/'+codProduto+'.jpg"/><p>'+produto+'</p>');
                         $("#materialSolicitadoList").html('');
                         $.each(json.pendentes, function(idx, field){
